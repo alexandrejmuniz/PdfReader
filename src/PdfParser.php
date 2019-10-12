@@ -99,6 +99,32 @@ class PdfParser
         }   
         return $this;
     }
+
+    public function search_all_content($search,$open_tag,$close_tag,$tamanho_texto)
+    {
+        $load_query = "SELECT * FROM arquivo  WHERE status = 1 AND conteudo LIKE '%".$search."%'";
+        $res = $this->db_instance->query($load_query);
+
+        if($res->num_rows>0)        
+        {
+            $itens = $res->fetch_all(MYSQLI_ASSOC);
+
+            foreach($itens as &$item)
+            {
+                $final = strstr($item['conteudo'],$search);
+                $final = substr($final,0,$tamanho_texto);
+
+                $inicio = strstr($item['conteudo'],$search,true);
+                $inicio = substr($inicio,0,$tamanho_texto);
+
+
+                $item['conteudo_busca'] = $inicio.$final;
+            }
+
+            return $itens;
+        }
+        return FALSE;
+    }
     
     public function load_all_content($type=null)
     {
